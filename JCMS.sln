@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JCMS.Web", "JCMS.Web\JCMS.Web.csproj", "{E44248C6-07B0-44BE-AC30-CA1724EF35C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JCMS.Application", "JCMS.Application\JCMS.Application.csproj", "{43EB2239-4FA7-4017-8368-A936C695D467}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JCMS.Infrastructure", "JCMS.Infrastructure\JCMS.Infrastructure.csproj", "{1F6BCBA9-31C3-4754-BBDD-C77AD9A4B140}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E44248C6-07B0-44BE-AC30-CA1724EF35C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E44248C6-07B0-44BE-AC30-CA1724EF35C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E44248C6-07B0-44BE-AC30-CA1724EF35C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E44248C6-07B0-44BE-AC30-CA1724EF35C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43EB2239-4FA7-4017-8368-A936C695D467}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43EB2239-4FA7-4017-8368-A936C695D467}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43EB2239-4FA7-4017-8368-A936C695D467}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43EB2239-4FA7-4017-8368-A936C695D467}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F6BCBA9-31C3-4754-BBDD-C77AD9A4B140}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F6BCBA9-31C3-4754-BBDD-C77AD9A4B140}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F6BCBA9-31C3-4754-BBDD-C77AD9A4B140}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F6BCBA9-31C3-4754-BBDD-C77AD9A4B140}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
