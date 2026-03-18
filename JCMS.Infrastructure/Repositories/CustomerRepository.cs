@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using JCMS.Infrastructure.Entities;
 using JCMS.Infrastructure.Data;
+using JCMS.Infrastructure.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace JCMS.Infrastructure.Repositories
 {
@@ -17,12 +19,39 @@ namespace JCMS.Infrastructure.Repositories
             _context = context;
         }
 
-        public Customer GetById(int id) => _context.Customers.Find(id);
-
-        public IEnumerable<Customer> Search(string query)
+        public Customer? GetById(int id)
         {
-            // TODO: Implement search accross last name, email, phone
-            return new List<Customer>();
+            return _context.Customers
+                .Include(c => c.JewelryItems)
+                .FirstOrDefault(c => c.Id == id);
+        }
+
+        public Customer? GetByEmail(string email)
+        {
+            return _context.Customers
+                .FirstOrDefault(c => c.Email == email);
+        }
+
+        public IEnumerable<Customer> Search(string? term)
+        {
+            if (string.IsNullOrWhiteSpace(term))
+            {
+                return _context.Customers
+                    .OrderBy(c => c.LastName)
+                    .ThenBy(c => c.FirstName)
+                    .ToList();
+            }
+
+            term = term.Trim();
+
+            return _context.Customers
+                .Where(c =>
+                    c.LastName.Contains(term) ||
+                    c.Email.Contains(term) ||
+                    c.Phone.Contains(term))
+                .OrderBy(c => c.LastName)
+                .ThenBy(c => c.FirstName)
+                .ToList();
         }
 
         public void Add(Customer customer)
@@ -33,6 +62,11 @@ namespace JCMS.Infrastructure.Repositories
         public void Update(Customer customer)
         {
             _context.Customers.Update(customer);
+        }
+
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
         }
     }
 }

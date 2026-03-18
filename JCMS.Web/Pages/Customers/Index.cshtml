@@ -5,4 +5,38 @@
 }
 
 <h1>Customers</h1>
-<p>Placeholder Customers page</p>
+<form method="get" class="mb-3">
+    <div class="input-group">
+        <input asp-for="SearchTerm" class="form-control" placeholder="Search by last name, email, or phone" />
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+</form>
+
+<a class="btn btn-success mb-3" asp-page="Create">Create New Customer</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Last Name</th>
+            <th>First Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model.Customers)
+        {
+            <tr>
+                <td>@c.LastName</td>
+                <td>@c.FirstName</td>
+                <td>@c.Email</td>
+                <td>@c.Phone</td>
+                <td>
+                    <a class="btn btn-sm btn-primary" asp-page="Details" asp-route-id="@c.Id">Details</a>
+                    <a class="btn btn-sm btn-secondary" asp-page="Edit" asp-route-id="@c.Id">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

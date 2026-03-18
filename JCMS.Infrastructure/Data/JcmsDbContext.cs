@@ -32,7 +32,7 @@ namespace JCMS.Infrastructure.Data
                 .IsUnique();
 
             modelBuilder.Entity<Staff>()
-                .HasIndex(s => s.UserName)
+                .HasIndex(s => s.Username)
                 .IsUnique();
 
             // Charm bracelet - restrict
