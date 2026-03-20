@@ -1,11 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using JCMS.Application.Services;
 using JCMS.Infrastructure.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace JCMS.Web.Pages.Customers
 {
+    [Authorize]
     public class EditModel : PageModel
     {
         private readonly CustomerService _customerService;

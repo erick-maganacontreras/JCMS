@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using JCMS.Application.Services;
 using JCMS.Infrastructure.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace JCMS.Web.Pages.Customers
 {
+    [Authorize]
     public class IndexModel : PageModel
     {
         public readonly CustomerService _customerService;
