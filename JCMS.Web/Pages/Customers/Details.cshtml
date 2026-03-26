@@ -1,0 +1,47 @@
+﻿@page "{id:int}"
+@model JCMS.Web.Pages.Customers.DetailsModel
+@{
+    ViewData["Title"] = "Customer Details";
+}
+
+<h1>Customer Details</h1>
+
+@if (Model.Customer != null)
+{
+    <h3>@Model.Customer.FirstName @Model.Customer.LastName</h3>
+    <p>Email: @Model.Customer.Email</p>
+    <p>Phone: @Model.Customer.Phone</p>
+}
+
+<hr />
+
+<h2>Jewelry Inventory</h2>
+
+<a class="btn btn-success mb-3" asp-page="/Jewelry/Create" asp-route-customerId="@Model.Customer?.Id">
+    Add Jewelry Item
+</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Item Type</th>
+            <th>Description</th>
+            <th>Last Cleaning</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>@item.ItemType</td>
+                <td>@item.Description</td>
+                <td>@item.LastCleaningDate</td>
+                <td>
+                    <a class="btn btn-sm btn-secondary" asp-page="/Jewelry/Edit" asp-route-id="@item.Id">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<a asp-page="Index" class="btn btn-secondary">Back to Customers</a>

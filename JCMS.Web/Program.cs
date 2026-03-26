@@ -17,10 +17,12 @@ builder.Services.AddDbContext<JcmsDbContext>(options =>
 // Repositories
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IStaffRepository, StaffRepository>();
+builder.Services.AddScoped<IJewelryItemRepository,  JewelryItemRepository>();
 
 // Services
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<JewelryItemService>();
 
 // Authentication & Authorization
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
