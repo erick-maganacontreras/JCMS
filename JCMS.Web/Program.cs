@@ -18,11 +18,15 @@ builder.Services.AddDbContext<JcmsDbContext>(options =>
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IStaffRepository, StaffRepository>();
 builder.Services.AddScoped<IJewelryItemRepository,  JewelryItemRepository>();
+builder.Services.AddScoped<ICleaningOrderRepository, CleaningOrderRepository>();
+builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+builder.Services.AddScoped<ICleaningHistoryRepository, CleaningHistoryRepository>();
 
 // Services
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<JewelryItemService>();
+builder.Services.AddScoped<CleaningOrderService>();
 
 // Authentication & Authorization
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -37,8 +41,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminOnly", policy =>
-    policy.RequireRole("Admin"));
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
 });
 
 var app = builder.Build();

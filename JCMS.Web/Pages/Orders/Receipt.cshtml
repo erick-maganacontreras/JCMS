@@ -1,0 +1,37 @@
+﻿@page "{id:int}"
+@model JCMS.Web.Pages.Orders.ReceiptModel
+@{
+    ViewData["Title"] = "Cleaning Receipt";
+}
+
+<h1>Cleaning Receipt</h1>
+
+@if (Model.Order != null)
+{
+    <p><strong>Confirmation Number:</strong> @Model.Order.ConfirmationNumber</p>
+    <p><strong>Customer:</strong> @Model.Order.Customer.FirstName @Model.Order.Customer.LastName</p>
+    <p><strong>Check-In Date/Time:</strong> @Model.Order.CheckInAt.ToLocalTime()</p>
+    <p><strong>Estimated Completion:</strong> @Model.Order.CheckInAt.ToLocalTime().AddHours(2)</p>
+
+    <h3>Items Being Cleaned</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Item Type</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Order.OrderItems)
+            {
+                <tr>
+                    <td>@item.JewelryItem.ItemType</td>
+                    <td>@item.JewelryItem.Description</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button class="btn btn-primary" onclick="window.print()">Print Receipt</button>
+    <a asp-page="/Dashboard/Index" class="btn btn-secondary">Done</a>
+}

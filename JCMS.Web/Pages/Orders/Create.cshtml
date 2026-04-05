@@ -5,4 +5,96 @@
 }
 
 <h1>Create Cleaning Order</h1>
-<p>Placeholder check-in screen</p>
+
+@if (Model.Customer != null)
+{
+    <h3>@Model.Customer.FirstName @Model.Customer.LastName</h3>
+    <p>Email: @Model.Customer.Email</p>
+    <p>Phone: @Model.Customer.Phone</p>
+}
+
+<div class="text-danger" asp-validation-summary="All"></div>
+
+<form method="post">
+    <input type="hidden" asp-for="CustomerId" />
+
+    <h4>Select Existing Items</h4>
+
+    @if (Model.InventoryItems.Any())
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Item Type</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.InventoryItems)
+                {
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="SelectedItemIds" value="@item.Id" />
+                        </td>
+                        <td>@item.ItemType</td>
+                        <td>@item.Description</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>This customer has no jewelry items saved yet.</p>
+    }
+
+    <hr />
+
+    <h4>Add New Item During Check-In</h4>
+
+    <div class="form-check mb-3">
+        <input asp-for="Input.AddNewItemInline" class="form-check-input" />
+        <label asp-for="Input.AddNewItemInline" class="form-check-label"></label>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.NewItemType" class="form-label"></label>
+        <select asp-for="Input.NewItemType" class="form-select">
+            <option value="">-- Select type --</option>
+            <option>Ring</option>
+            <option>Necklace</option>
+            <option>Bracelet</option>
+            <option>Earrings</option>
+            <option>Charm</option>
+            <option>Anklet</option>
+            <option>Other</option>
+        </select>
+        <span asp-validation-for="Input.NewItemType" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.NewItemDescription" class="form-label"></label>
+        <input asp-for="Input.NewItemDescription" class="form-control" />
+        <span asp-validation-for="Input.NewItemDescription" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.NewItemParentItemId" class="form-label"></label>
+        <select asp-for="Input.NewItemParentItemId" class="form-select">
+            <option value="">(None)</option>
+            @foreach (var bracelet in Model.BraceletOptions)
+            {
+                <option value="@bracelet.Id">@bracelet.Description</option>
+            }
+        </select>
+        <span asp-validation-for="Input.NewItemParentItemId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Order</button>
+    <a asp-page="/Customers/Details" asp-route-id="@Model.CustomerId" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
