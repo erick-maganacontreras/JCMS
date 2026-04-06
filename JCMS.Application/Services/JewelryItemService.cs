@@ -26,7 +26,12 @@ namespace JCMS.Application.Services
 
         public IEnumerable<JewelryItem> GetBraceletsForCustomer(int customerId)
         {
-            return _jewelryItemRepository.GetBraceletsForCustomer(customerId);
+            return _jewelryItemRepository.GetBraceletsByCustomerId(customerId);
+        }
+
+        public IEnumerable<CleaningHistory> GetCleaningHistoryForCustomer(int customerId)
+        {
+            return _jewelryItemRepository.GetCleaningHistoryForCustomer(customerId);
         }
 
         public JewelryItem? GetById(int id)

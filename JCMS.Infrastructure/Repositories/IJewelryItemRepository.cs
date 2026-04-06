@@ -11,7 +11,8 @@ namespace JCMS.Infrastructure.Repositories
     {
         JewelryItem? GetById(int id);
         IEnumerable<JewelryItem> GetByCustomerId(int Id);
-        IEnumerable<JewelryItem> GetBraceletsForCustomer(int customerId);
+        IEnumerable<JewelryItem> GetBraceletsByCustomerId(int customerId);
+        IEnumerable<CleaningHistory> GetCleaningHistoryForCustomer(int customerId);
         void Add(JewelryItem item);
         void Update(JewelryItem item);
         void SaveChanges();

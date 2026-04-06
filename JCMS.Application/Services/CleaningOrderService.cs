@@ -15,6 +15,7 @@ namespace JCMS.Application.Services
         private readonly ICleaningOrderRepository _cleaningOrderRepository;
         private readonly IOrderItemRepository _orderItemRepository;
         private readonly IStaffRepository _staffRepository;
+        private readonly ICleaningHistoryRepository _cleaningHistoryRepository;
 
         public CleaningOrderService(
             JcmsDbContext context,
@@ -22,7 +23,8 @@ namespace JCMS.Application.Services
             IJewelryItemRepository jewelryItemRepository,
             ICleaningOrderRepository cleaningOrderRepository,
             IOrderItemRepository orderItemRepository,
-            IStaffRepository staffRepository)
+            IStaffRepository staffRepository,
+            ICleaningHistoryRepository cleaningHistoryRepository)
         {
             _context = context;
             _customerRepository = customerRepository;
@@ -30,6 +32,12 @@ namespace JCMS.Application.Services
             _cleaningOrderRepository = cleaningOrderRepository;
             _orderItemRepository = orderItemRepository;
             _staffRepository = staffRepository;
+            _cleaningHistoryRepository = cleaningHistoryRepository;
+        }
+
+        public IEnumerable<CleaningOrder> GetActiveOrders()
+        {
+            return _cleaningOrderRepository.GetActiveOrders();
         }
 
         public CleaningOrder? GetById(int id)
@@ -133,6 +141,16 @@ namespace JCMS.Application.Services
                     };
 
                     _orderItemRepository.Add(orderItem);
+
+                    var history = new CleaningHistory
+                    {
+                        JewelryItemId = itemId,
+                        CleaningDate = DateTime.UtcNow,
+                        ConfirmationNumber = confirmationNumber,
+                        StaffId= staffId
+                    };
+
+                    _cleaningHistoryRepository.Add(history);
                 }
 
                 _context.SaveChanges();
@@ -145,6 +163,35 @@ namespace JCMS.Application.Services
                 transaction.Rollback();
                 return (false, "An error occurred while creating the order.", 0, null);
             }
+        }
+
+        public (bool Success, string? ErrorMessage) UpdateStatus(int orderId, string newStatus)
+        {
+            var order = _cleaningOrderRepository.GetById(orderId);
+            if (order == null)
+            {
+                return (false, "Order not found.");
+            }
+
+            if (string.IsNullOrWhiteSpace(newStatus))
+            {
+                return (false, "A valid status is required.");
+            }
+
+            order.Status = newStatus.Trim();
+
+            if (newStatus == "Completed" && order.CompletedAt == null)
+            {
+                order.CompletedAt = DateTime.UtcNow;
+            }
+
+            if (newStatus == "Picked Up" && order.PickedUpAt == null)
+            {
+                order.PickedUpAt = DateTime.UtcNow;
+            }
+
+            _cleaningOrderRepository.SaveChanges();
+            return (true, null);
         }
 
         private string GenerateUniqueConfirmationNumber()

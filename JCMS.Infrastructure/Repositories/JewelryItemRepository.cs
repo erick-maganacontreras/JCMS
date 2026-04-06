@@ -36,11 +36,21 @@ namespace JCMS.Infrastructure.Repositories
                 .ToList();
         }
 
-        public IEnumerable<JewelryItem> GetBraceletsForCustomer(int customerId)
+        public IEnumerable<JewelryItem> GetBraceletsByCustomerId(int customerId)
         {
             return _context.JewelryItems
                 .Where(j => j.CustomerId == customerId && j.ItemType == "Bracelet")
                 .OrderBy(j => j.Description)
+                .ToList();
+        }
+
+        public IEnumerable<CleaningHistory> GetCleaningHistoryForCustomer(int customerId)
+        {
+            return _context.CleaningHistory
+                .Include(h => h.JewelryItem)
+                .Include(h => h.Staff)
+                .Where(h => h.JewelryItem.CustomerId == customerId)
+                .OrderByDescending(h => h.CleaningDate)
                 .ToList();
         }
 

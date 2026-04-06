@@ -1,0 +1,61 @@
+﻿@page "{id:int}"
+@model JCMS.Web.Pages.Orders.DetailsModel
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+@if (Model.Order != null)
+{
+    <h1>Order Details</h1>
+
+    <p><strong>Confirmation Number:</strong> @Model.Order.ConfirmationNumber</p>
+    <p><strong>Customer:</strong> @Model.Order.Customer.FirstName @Model.Order.Customer.LastName</p>
+    <p><strong>Created By:</strong> @Model.Order.Staff.Username (@Model.Order.Staff.Role)</p>
+    <p><strong>Status:</strong> @Model.Order.Status</p>
+    <p><strong>Checked In:</strong> @Model.Order.CheckInAt.ToLocalTime()</p>
+
+    @if (Model.Order.CompletedAt != null)
+    {
+        <p><strong>Completed:</strong> @Model.Order.CompletedAt.Value.ToLocalTime()</p>
+    }
+
+    @if (Model.Order.PickedUpAt != null)
+    {
+        <p><strong>Picked Up:</strong> @Model.Order.PickedUpAt.Value.ToLocalTime()</p>
+    }
+
+    <h3>Items</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Item Type</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Order.OrderItems)
+            {
+                <tr>
+                    <td>@item.JewelryItem.ItemType</td>
+                    <td>@item.JewelryItem.Description</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <hr />
+
+    <h3>Update Status</h3>
+
+    <div class="text-danger" asp-validation-summary="All"></div>
+
+    <form method="post" asp-page-handler="UpdateStatus">
+        <div class="mb-3">
+            <label asp-for="NewStatus" class="form-label">New Status</label>
+            <select asp-for="NewStatus" asp-items="Model.StatusOptions" class="form-select"></select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Status</button>
+        <a asp-page="/Orders/Index" class="btn btn-secondary">Back to Orders</a>
+    </form>
+}

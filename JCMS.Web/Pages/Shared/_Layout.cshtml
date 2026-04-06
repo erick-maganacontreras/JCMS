@@ -26,7 +26,10 @@
                             <a class="nav-link text-dark" asp-page="/Customers/Index">Customers</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-page="/Orders/Create">Orders</a>
+                            <a class="nav-link text-dark" asp-page="/Orders/Index">Orders</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-page="/Customers/History" asp-route-id="@Model.Customer?Id">View Cleaning History</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-page="/Dashboard/Index">Dashboard</a>

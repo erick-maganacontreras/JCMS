@@ -38,8 +38,12 @@ namespace JCMS.Infrastructure.Repositories
         public IEnumerable<CleaningOrder> GetActiveOrders()
         {
             return _context.CleaningOrder
+                .Include(o => o.Customer)
+                .Include(o => o.Staff)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.JewelryItem)
                 .Where(o => o.Status != "Picked Up" && o.Status != "Cancelled")
-                .OrderBy(o => o.CheckInAt)
+                .OrderByDescending(o => o.CheckInAt)
                 .ToList();
         }
 
