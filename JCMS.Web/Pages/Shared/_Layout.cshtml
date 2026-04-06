@@ -29,7 +29,7 @@
                             <a class="nav-link text-dark" asp-page="/Orders/Index">Orders</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-page="/Customers/History" asp-route-id="@Model.Customer?Id">View Cleaning History</a>
+                            <a class="nav-link text-dark" asp-page="/Customers/History" @* asp-route-id="@Model.Customer?Id" *@>View Cleaning History</a> @* TODO: Fix page routing *@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-page="/Dashboard/Index">Dashboard</a>
