@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using JCMS.Infrastructure.Data;
 using JCMS.Infrastructure.Entities;
 using JCMS.Infrastructure.Repositories;
@@ -40,9 +41,58 @@ namespace JCMS.Application.Services
             return _cleaningOrderRepository.GetActiveOrders();
         }
 
+        public IEnumerable<CleaningOrder> Search(string? searchTerm, string? status)
+        {
+            return _cleaningOrderRepository.Search(searchTerm, status);
+        }
+
         public CleaningOrder? GetById(int id)
         {
             return _cleaningOrderRepository.GetById(id);
+        }
+
+        public OrderReportViewModel GetReport(DateTime startDate, DateTime endDate)
+        {
+            var orders = _cleaningOrderRepository.GetOrdersByDateRange(startDate, endDate).ToList();
+
+            return new OrderReportViewModel
+            {
+                StartDate = startDate,
+                EndDate = endDate,
+                TotalOrders = orders.Count,
+                CheckedInCount = orders.Count(o => o.Status == "Checked In"),
+                InProgressCount = orders.Count(o => o.Status == "In Progress"),
+                CompletedCount = orders.Count(o => o.Status == "Completed"),
+                PickedUpCount = orders.Count(o => o.Status == "Picked Up"),
+                CancelledCount = orders.Count(o => o.Status == "Cancelled"),
+                Orders = orders
+            };
+        }
+
+        public byte[] ExportReportToCsv(DateTime startDate, DateTime endDate)
+        {
+            var report = GetReport(startDate, endDate);
+            var builder = new StringBuilder();
+
+            builder.AppendLine("ConfirmationNumber,CustomerName,Status,CheckInDate,CompletionDate,ItemCount");
+
+            foreach (var order in report.Orders)
+            {
+                var customerName = $"{order.Customer.FirstName} {order.Customer.LastName}";
+                var completionDate = order.CompletedAt.HasValue
+                    ? order.CompletedAt.Value.ToLocalTime().ToString("g")
+                    : "";
+
+                builder.AppendLine(
+                    $"\"{order.ConfirmationNumber}\"," +
+                    $"\"{customerName}\"," +
+                    $"\"{order.Status}\"," +
+                    $"\"{order.CheckInAt.ToLocalTime():g}\"," +
+                    $"\"{completionDate}\"," +
+                    $"\"{order.OrderItems.Count}\"");
+            }
+
+            return Encoding.UTF8.GetBytes(builder.ToString());
         }
 
         public (bool Success, string? ErrorMessage, int OrderId, string? ConfirmationNumber) CreateOrder(
@@ -100,26 +150,28 @@ namespace JCMS.Application.Services
 
             var distinctItemIds = selectedItemIds.Distinct().ToList();
 
-            foreach (var itemId in distinctItemIds)
-            {
-                var item = _jewelryItemRepository.GetById(itemId);
-                if (item == null || item.CustomerId != customerId)
-                {
-                    return (false, "One or more selected items do not belong to the selected customer.", 0, null);
-                }
-
-                if (_cleaningOrderRepository.ItemIsInActiveOrder(itemId))
-                {
-                    return (false, $"Item '{item.Description}' is already part of an active cleaning order.", 0, null);
-                }
-            }
-
-            var confirmationNumber = GenerateUniqueConfirmationNumber();
-
             using var transaction = _context.Database.BeginTransaction();
 
             try
             {
+                foreach (var itemId in distinctItemIds)
+                {
+                    var item = _jewelryItemRepository.GetById(itemId);
+                    if (item == null || item.CustomerId != customerId)
+                    {
+                        transaction.Rollback();
+                        return (false, "One or more selected items do not belong to the selected customer.", 0, null);
+                    }
+
+                    if (_cleaningOrderRepository.ItemIsInActiveOrder(itemId))
+                    {
+                        transaction.Rollback();
+                        return (false, $"Item '{item.Description}' is already part of an active cleaning order.", 0, null);
+                    }
+                }
+
+                var confirmationNumber = GenerateUniqueConfirmationNumber();
+
                 var order = new CleaningOrder
                 {
                     CustomerId = customerId,
@@ -141,16 +193,6 @@ namespace JCMS.Application.Services
                     };
 
                     _orderItemRepository.Add(orderItem);
-
-                    var history = new CleaningHistory
-                    {
-                        JewelryItemId = itemId,
-                        CleaningDate = DateTime.UtcNow,
-                        ConfirmationNumber = confirmationNumber,
-                        StaffId= staffId
-                    };
-
-                    _cleaningHistoryRepository.Add(history);
                 }
 
                 _context.SaveChanges();
@@ -183,6 +225,19 @@ namespace JCMS.Application.Services
             if (newStatus == "Completed" && order.CompletedAt == null)
             {
                 order.CompletedAt = DateTime.UtcNow;
+
+                foreach (var item in order.OrderItems)
+                {
+                    var history = new CleaningHistory
+                    {
+                        JewelryItemId = item.JewelryItemId,
+                        CleaningDate = DateTime.UtcNow,
+                        ConfirmationNumber = order.ConfirmationNumber,
+                        StaffId = order.StaffId
+                    };
+
+                    _cleaningHistoryRepository.Add(history);
+                }
             }
 
             if (newStatus == "Picked Up" && order.PickedUpAt == null)
@@ -211,5 +266,18 @@ namespace JCMS.Application.Services
                 }
             }
         }
+    }
+
+    public class OrderReportViewModel
+    {
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public int TotalOrders { get; set; }
+        public int CheckedInCount { get; set; }
+        public int InProgressCount { get; set; }
+        public int CompletedCount { get; set; }
+        public int PickedUpCount { get; set; }
+        public int CancelledCount { get; set; }
+        public List<CleaningOrder> Orders { get; set; } = new();
     }
 }

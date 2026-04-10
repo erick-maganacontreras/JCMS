@@ -47,6 +47,45 @@ namespace JCMS.Infrastructure.Repositories
                 .ToList();
         }
 
+        public IEnumerable<CleaningOrder> Search(string? searchTerm, string? status)
+        {
+            var query = _context.CleaningOrder
+                .Include(o => o.Customer)
+                .Include(o => o.Staff)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.JewelryItem)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                searchTerm = searchTerm.Trim();
+
+                query = query.Where(o =>
+                o.ConfirmationNumber.Contains(searchTerm) ||
+                o.Customer.FirstName.Contains(searchTerm) ||
+                o.Customer.LastName.Contains(searchTerm));
+            }
+
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                query = query.Where(o => o.Status == status);
+            }
+
+            return query.OrderByDescending(o => o.CheckInAt).ToList();
+        }
+
+        public IEnumerable<CleaningOrder> GetOrdersByDateRange(DateTime startDate, DateTime endDate)
+        {
+            return _context.CleaningOrder
+                .Include(o => o.Customer)
+                .Include(o => o.Staff)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.JewelryItem)
+                .Where(o => o.CheckInAt >= startDate && o.CheckInAt <= endDate)
+                .OrderByDescending(o => o.CheckInAt)
+                .ToList();
+        }
+
         public bool ItemIsInActiveOrder(int jewelryItemId)
         {
             return _context.OrderItems

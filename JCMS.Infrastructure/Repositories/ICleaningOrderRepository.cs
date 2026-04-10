@@ -12,6 +12,8 @@ namespace JCMS.Infrastructure.Repositories
         CleaningOrder? GetById(int id);
         CleaningOrder? GetByConfirmationNumber(string confirmationNumber);
         IEnumerable<CleaningOrder> GetActiveOrders();
+        IEnumerable<CleaningOrder> Search(string? searchTerm, string? status);
+        IEnumerable<CleaningOrder> GetOrdersByDateRange(DateTime stardDate, DateTime endDate);
         bool ItemIsInActiveOrder(int jewelryItemId);
         void Add(CleaningOrder order);
         void SaveChanges();
