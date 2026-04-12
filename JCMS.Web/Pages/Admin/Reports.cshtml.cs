@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
-using static JCMS.Application.Services.CleaningOrderService;
 
 namespace JCMS.Web.Pages.Admin
 {

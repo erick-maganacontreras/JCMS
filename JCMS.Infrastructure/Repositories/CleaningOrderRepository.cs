@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using JCMS.Infrastructure.Constants;
 using JCMS.Infrastructure.Data;
 using JCMS.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -42,7 +43,7 @@ namespace JCMS.Infrastructure.Repositories
                 .Include(o => o.Staff)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.JewelryItem)
-                .Where(o => o.Status != "Picked Up" && o.Status != "Cancelled")
+                .Where(o => o.Status != OrderStatuses.PickedUp && o.Status != OrderStatuses.Cancelled)
                 .OrderByDescending(o => o.CheckInAt)
                 .ToList();
         }
@@ -92,8 +93,8 @@ namespace JCMS.Infrastructure.Repositories
                 .Include(oi => oi.CleaningOrder)
                 .Any(oi =>
                     oi.JewelryItemId == jewelryItemId &&
-                    oi.CleaningOrder.Status != "Picked Up" &&
-                    oi.CleaningOrder.Status != "Cancelled");
+                    oi.CleaningOrder.Status != OrderStatuses.PickedUp &&
+                    oi.CleaningOrder.Status != OrderStatuses.Cancelled);
         }
 
         public void Add(CleaningOrder order)

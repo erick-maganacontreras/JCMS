@@ -5,6 +5,7 @@ using System.Text;
 using JCMS.Infrastructure.Data;
 using JCMS.Infrastructure.Entities;
 using JCMS.Infrastructure.Repositories;
+using JCMS.Infrastructure.Constants;
 
 namespace JCMS.Application.Services
 {
@@ -60,11 +61,11 @@ namespace JCMS.Application.Services
                 StartDate = startDate,
                 EndDate = endDate,
                 TotalOrders = orders.Count,
-                CheckedInCount = orders.Count(o => o.Status == "Checked In"),
-                InProgressCount = orders.Count(o => o.Status == "In Progress"),
-                CompletedCount = orders.Count(o => o.Status == "Completed"),
-                PickedUpCount = orders.Count(o => o.Status == "Picked Up"),
-                CancelledCount = orders.Count(o => o.Status == "Cancelled"),
+                CheckedInCount = orders.Count(o => o.Status == OrderStatuses.CheckedIn),
+                InProgressCount = orders.Count(o => o.Status == OrderStatuses.InProgress),
+                CompletedCount = orders.Count(o => o.Status == OrderStatuses.Completed),
+                PickedUpCount = orders.Count(o => o.Status == OrderStatuses.PickedUp),
+                CancelledCount = orders.Count(o => o.Status == OrderStatuses.Cancelled),
                 Orders = orders
             };
         }
@@ -177,7 +178,7 @@ namespace JCMS.Application.Services
                     CustomerId = customerId,
                     StaffId = staffId,
                     ConfirmationNumber = confirmationNumber,
-                    Status = "Checked In",
+                    Status = OrderStatuses.CheckedIn,
                     CheckInAt = DateTime.UtcNow
                 };
 
@@ -209,20 +210,29 @@ namespace JCMS.Application.Services
 
         public (bool Success, string? ErrorMessage) UpdateStatus(int orderId, string newStatus)
         {
+            var validStatuses = new[]
+            {
+                OrderStatuses.CheckedIn,
+                OrderStatuses.InProgress,
+                OrderStatuses.Completed,
+                OrderStatuses.PickedUp,
+                OrderStatuses.Cancelled
+            };
+
             var order = _cleaningOrderRepository.GetById(orderId);
             if (order == null)
             {
                 return (false, "Order not found.");
             }
 
-            if (string.IsNullOrWhiteSpace(newStatus))
+            if (string.IsNullOrWhiteSpace(newStatus) || !validStatuses.Contains(newStatus))
             {
                 return (false, "A valid status is required.");
             }
 
             order.Status = newStatus.Trim();
 
-            if (newStatus == "Completed" && order.CompletedAt == null)
+            if (newStatus == OrderStatuses.Completed && order.CompletedAt == null)
             {
                 order.CompletedAt = DateTime.UtcNow;
 
@@ -240,7 +250,7 @@ namespace JCMS.Application.Services
                 }
             }
 
-            if (newStatus == "Picked Up" && order.PickedUpAt == null)
+            if (newStatus == OrderStatuses.PickedUp && order.PickedUpAt == null)
             {
                 order.PickedUpAt = DateTime.UtcNow;
             }
