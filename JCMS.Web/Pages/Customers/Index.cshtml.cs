@@ -1,16 +1,17 @@
-using System.Collections.Generic;
 using JCMS.Application.Services;
 using JCMS.Infrastructure.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace JCMS.Web.Pages.Customers
 {
     [Authorize]
     public class IndexModel : PageModel
     {
-        public readonly CustomerService _customerService;
+        private readonly CustomerService _customerService;
 
         public IndexModel(CustomerService customerService)
         {
@@ -21,9 +22,10 @@ namespace JCMS.Web.Pages.Customers
         public string? SearchTerm { get; set; }
 
         public IList<Customer> Customers { get; set; } = new List<Customer>();
+
         public void OnGet()
         {
-            Customers = new List<Customer>(_customerService.Search(SearchTerm));
+            Customers = _customerService.Search(SearchTerm).ToList();
         }
     }
 }

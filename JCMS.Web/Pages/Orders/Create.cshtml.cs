@@ -31,14 +31,14 @@ namespace JCMS.Web.Pages.Orders
         public int CustomerId { get; set; }
 
         public Customer? Customer { get; set; }
-        public List<JewelryItem> InventoryItems { get; set; } = new List<JewelryItem>();
-        public List<JewelryItem> BraceletOptions { get; set; } = new List<JewelryItem>();
+        public List<JewelryItem> InventoryItems { get; set; } = new();
+        public List<JewelryItem> BraceletOptions { get; set; } = new();
 
         [BindProperty]
-        public List<int> SelectedItemIds { get; set; } = new List<int>();
+        public List<int> SelectedItemIds { get; set; } = new();
 
         [BindProperty]
-        public InputModel Input { get; set; } = new InputModel();
+        public InputModel Input { get; set; } = new();
 
         public class InputModel
         {
@@ -73,7 +73,10 @@ namespace JCMS.Web.Pages.Orders
                 return RedirectToPage("/Account/Login");
             }
 
-            int staffId = int.Parse(staffIdClaim);
+            if (!int.TryParse(staffIdClaim, out var staffId))
+            {
+                return RedirectToPage("/Account/Login");
+            }
 
             var result = _cleaningOrderService.CreateOrder(
                 CustomerId,

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using JCMS.Application.Services;
-using JCMS.Infrastructure.Entities;
 using JCMS.Infrastructure.Constants;
+using JCMS.Infrastructure.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -24,7 +24,7 @@ namespace JCMS.Web.Pages.Orders
         [BindProperty]
         public string NewStatus { get; set; } = string.Empty;
 
-        public List<SelectListItem> StatusOptions { get; set; } = new List<SelectListItem>
+        public List<SelectListItem> StatusOptions { get; set; } = new()
         {
             new SelectListItem { Value = OrderStatuses.CheckedIn, Text = OrderStatuses.CheckedIn },
             new SelectListItem { Value = OrderStatuses.InProgress, Text = OrderStatuses.InProgress },
@@ -47,11 +47,18 @@ namespace JCMS.Web.Pages.Orders
 
         public IActionResult OnPostUpdateStatus(int id)
         {
+            var order = _cleaningOrderService.GetById(id);
+            if (order == null)
+            {
+                return NotFound();
+            }
+
             var result = _cleaningOrderService.UpdateStatus(id, NewStatus);
             if (!result.Success)
             {
                 ModelState.AddModelError(string.Empty, result.ErrorMessage ?? "Unable to update the order status.");
-                Order = _cleaningOrderService.GetById(id);
+                Order = order;
+                NewStatus = order.Status;
                 return Page();
             }
 

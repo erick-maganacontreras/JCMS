@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using JCMS.Application.Services;
-using JCMS.Infrastructure.Entities;
 using JCMS.Infrastructure.Constants;
+using JCMS.Infrastructure.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -25,11 +25,11 @@ namespace JCMS.Web.Pages.Orders
         public string? SearchTerm { get; set; }
 
         [BindProperty(SupportsGet = true)]
-        public string? Status {  get; set; }
+        public string? Status { get; set; }
 
         public List<SelectListItem> StatusOptions { get; set; } = new()
         {
-            new SelectListItem { Value = "", Text = "All Statuses"},
+            new SelectListItem { Value = "", Text = "All Statuses" },
             new SelectListItem { Value = OrderStatuses.CheckedIn, Text = OrderStatuses.CheckedIn },
             new SelectListItem { Value = OrderStatuses.InProgress, Text = OrderStatuses.InProgress },
             new SelectListItem { Value = OrderStatuses.Completed, Text = OrderStatuses.Completed },

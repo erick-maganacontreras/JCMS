@@ -4,32 +4,59 @@
     ViewData["Title"] = "Staff Login";
 }
 
-<h1>Staff Login</h1>
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm mt-4">
+            <div class="card-body p-4">
+                <h1 class="h3 mb-3 text-center">Staff Login</h1>
+                <p class="text-muted text-center mb-4">
+                    Sign in with your staff username and password to access customer accounts, cleaning orders, and reports.
+                </p>
 
-<div class="text-danger" asp-validation-summary="All"></div>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-box" role="alert"></div>
 
-@if (!string.IsNullOrEmpty(Model.ErrorMessage))
-{
-    <div class="alert alert-danger">@Model.ErrorMessage</div>
-}
+                @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+                {
+                    <div class="alert alert-danger" role="alert">
+                        @Model.ErrorMessage
+                    </div>
+                }
 
-<form method="post">
-    <div class="mb-3">
-        <label asp-for="Input.Username" class="form-label"></label>
-        <input asp-for="Input.Username" class="form-control" />
-        <span asp-validation-for="Input.Username" class="text-danger"></span>
+                @if (!string.IsNullOrWhiteSpace(Model.InfoMessage))
+                {
+                    <div class="alert alert-info" role="alert">
+                        @Model.InfoMessage
+                    </div>
+                }
+
+                <form method="post" novalidate>
+                    <div class="mb-3">
+                        <label asp-for="Input.Username" class="form-label"></label>
+                        <input asp-for="Input.Username" class="form-control" autocomplete="username" />
+                        <div class="form-text">Enter the username assigned to your staff account.</div>
+                        <span asp-validation-for="Input.Username" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.Password" class="form-label"></label>
+                        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
+                        <div class="form-text">Passwords are case-sensitive.</div>
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input asp-for="Input.RememberMe" class="form-check-input" />
+                        <label asp-for="Input.RememberMe" class="form-check-label"></label>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Sign In</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-    <div class="mb-3">
-        <label asp-for="Input.Password" class="form-label"></label>
-        <input asp-for="Input.Password" class="form-control" />
-        <span asp-validation-for="Input.Password" class="text-danger"></span>
-    </div>
-    <div class="mb-3 form-check">
-        <input asp-for="Input.RememberMe" class="form-check-input" />
-        <label asp-for="Input.RememberMe" class="form-check-label"></label>
-    </div>
-    <button type="submit" class="btn btn-primary">Login</button>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

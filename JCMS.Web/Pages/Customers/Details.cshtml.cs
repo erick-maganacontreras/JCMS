@@ -14,7 +14,7 @@ namespace JCMS.Web.Pages.Customers
         private readonly CustomerService _customerService;
         private readonly JewelryItemService _jewelryItemService;
 
-        public DetailsModel( CustomerService customerService, JewelryItemService jewelryItemService)
+        public DetailsModel(CustomerService customerService, JewelryItemService jewelryItemService)
         {
             _customerService = customerService;
             _jewelryItemService = jewelryItemService;
@@ -26,8 +26,8 @@ namespace JCMS.Web.Pages.Customers
         public class JewelryItemViewModel
         {
             public int Id { get; set; }
-            public string ItemType { get; set; } = null!;
-            public string Description { get; set; } = null!;
+            public string ItemType { get; set; } = string.Empty;
+            public string Description { get; set; } = string.Empty;
             public string LastCleaningDate { get; set; } = "Never cleaned";
         }
 
@@ -55,16 +55,11 @@ namespace JCMS.Web.Pages.Customers
 
         private string GetLastCleaningDate(JewelryItem item)
         {
-            if (item.CleaningHistoryEntries == null || !item.CleaningHistoryEntries.Any())
-            {
-                return "Never cleaned";
-            }
-
-            var latest = item.CleaningHistoryEntries
+            var latest = item.CleaningHistoryEntries?
                 .OrderByDescending(h => h.CleaningDate)
                 .FirstOrDefault();
 
-            return latest?.CleaningDate.ToShortDateString() ?? "Never cleaned";
+            return latest == null ? "Never cleaned" : latest.CleaningDate.ToLocalTime().ToString("d");
         }
     }
 }

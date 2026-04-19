@@ -4,34 +4,63 @@
     ViewData["Title"] = "Cleaning Receipt";
 }
 
-<h1>Cleaning Receipt</h1>
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+                    <div>
+                        <h1 class="mb-1">Cleaning Receipt</h1>
+                        <p class="text-muted mb-0">Keep this receipt for pickup.</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="window.print()">Print Receipt</button>
+                </div>
 
-@if (Model.Order != null)
-{
-    <p><strong>Confirmation Number:</strong> @Model.Order.ConfirmationNumber</p>
-    <p><strong>Customer:</strong> @Model.Order.Customer.FirstName @Model.Order.Customer.LastName</p>
-    <p><strong>Check-In Date/Time:</strong> @Model.Order.CheckInAt.ToLocalTime()</p>
-    <p><strong>Estimated Completion:</strong> @Model.Order.CheckInAt.ToLocalTime().AddHours(2)</p>
+                @if (Model.Order != null)
+                {
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Confirmation Number</dt>
+                                <dd class="col-sm-8">@Model.Order.ConfirmationNumber</dd>
 
-    <h3>Items Being Cleaned</h3>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Item Type</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.Order.OrderItems)
-            {
-                <tr>
-                    <td>@item.JewelryItem.ItemType</td>
-                    <td>@item.JewelryItem.Description</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                                <dt class="col-sm-4">Customer</dt>
+                                <dd class="col-sm-8">@Model.Order.Customer.FirstName @Model.Order.Customer.LastName</dd>
 
-    <button class="btn btn-primary" onclick="window.print()">Print Receipt</button>
-    <a asp-page="/Dashboard/Index" class="btn btn-secondary">Done</a>
-}
+                                <dt class="col-sm-4">Check-In Date/Time</dt>
+                                <dd class="col-sm-8">@Model.Order.CheckInAt.ToLocalTime().ToString("g")</dd>
+
+                                <dt class="col-sm-4">Estimated Completion</dt>
+                                <dd class="col-sm-8">@Model.Order.CheckInAt.ToLocalTime().AddHours(2).ToString("g")</dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <h2 class="h4 mb-3">Items Being Cleaned</h2>
+
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Item Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Order.OrderItems)
+                                {
+                                    <tr>
+                                        <td>@item.JewelryItem.ItemType</td>
+                                        <td>@item.JewelryItem.Description</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <a asp-page="/Dashboard/Index" class="btn btn-secondary">Done</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

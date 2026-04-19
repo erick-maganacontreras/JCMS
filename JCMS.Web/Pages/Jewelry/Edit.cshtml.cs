@@ -17,18 +17,20 @@ namespace JCMS.Web.Pages.Jewelry
         }
 
         [BindProperty]
-        public InputModel Input { get; set; } = null!;
+        public InputModel Input { get; set; } = new();
 
         public class InputModel
         {
             public int Id { get; set; }
             public int CustomerId { get; set; }
 
-            public string ItemType { get; set; } = null!;
+            [Display(Name = "Item Type")]
+            public string ItemType { get; set; } = string.Empty;
 
-            [Required]
-            [MaxLength(500)]
-            public string Description { get; set; } = null!;
+            [Required(ErrorMessage = "Enter a description for the jewelry item.")]
+            [MaxLength(500, ErrorMessage = "The description cannot be longer than 500 characters.")]
+            [Display(Name = "Description")]
+            public string Description { get; set; } = string.Empty;
         }
 
         public IActionResult OnGet(int id)

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using JCMS.Application.Services;
@@ -6,7 +7,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.ComponentModel.DataAnnotations;
 
 namespace JCMS.Web.Pages.Account
 {
@@ -20,27 +20,40 @@ namespace JCMS.Web.Pages.Account
         }
 
         [BindProperty]
-        public InputModel Input { get; set; } = new InputModel();
+        public InputModel Input { get; set; } = new();
 
         [TempData]
         public string? ErrorMessage { get; set; }
 
+        [TempData]
+        public string? InfoMessage { get; set; }
+
         public class InputModel
         {
-            [Required]
-            public string Username { get; set; } = null!;
+            [Required(ErrorMessage = "Enter your username.")]
+            [Display(Name = "Username")]
+            public string Username { get; set; } = string.Empty;
 
-            [Required]
+            [Required(ErrorMessage = "Enter your password.")]
             [DataType(DataType.Password)]
-            public string Password { get; set; } = null!;
+            [Display(Name = "Password")]
+            public string Password { get; set; } = string.Empty;
 
-            [Display(Name = "Remember me")]
+            [Display(Name = "Keep me signed in on this device")]
             public bool RememberMe { get; set; }
         }
 
         public void OnGet()
         {
-            // no-op
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                InfoMessage = "You are already signed in.";
+            }
+
+            if (TempData.ContainsKey("SessionExpired"))
+            {
+                InfoMessage = "Your session expired due to 30 minutes of inactivity. Please sign in again.";
+            }
         }
 
         public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
@@ -50,10 +63,10 @@ namespace JCMS.Web.Pages.Account
                 return Page();
             }
 
-            var user = _authService.Authenticate(Input.Username, Input.Password, out var error);
+            var user = _authService.Authenticate(Input.Username, Input.Password, out var errorMessage);
             if (user == null)
             {
-                ModelState.AddModelError(string.Empty, error ?? "Invalid login attempt.");
+                ModelState.AddModelError(string.Empty, errorMessage ?? "The username or password is incorrect.");
                 return Page();
             }
 
@@ -65,7 +78,8 @@ namespace JCMS.Web.Pages.Account
             };
 
             var claimsIdentity = new ClaimsIdentity(
-                claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                claims,
+                CookieAuthenticationDefaults.AuthenticationScheme);
 
             var authProperties = new AuthenticationProperties
             {
@@ -77,7 +91,7 @@ namespace JCMS.Web.Pages.Account
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties);
 
-            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
             {
                 return Redirect(returnUrl);
             }

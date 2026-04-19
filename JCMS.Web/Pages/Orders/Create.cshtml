@@ -4,96 +4,133 @@
     ViewData["Title"] = "Create Cleaning Order";
 }
 
-<h1>Create Cleaning Order</h1>
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+            <div>
+                <h1 class="mb-1">Create Cleaning Order</h1>
+                <p class="text-muted mb-0">Select one or more items and assign them to a new cleaning order.</p>
+            </div>
+        </div>
 
-@if (Model.Customer != null)
-{
-    <h3>@Model.Customer.FirstName @Model.Customer.LastName</h3>
-    <p>Email: @Model.Customer.Email</p>
-    <p>Phone: @Model.Customer.Phone</p>
-}
+        @if (Model.Customer != null)
+        {
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h5 mb-3">Customer</h2>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-2">Name</dt>
+                        <dd class="col-sm-10">@Model.Customer.FirstName @Model.Customer.LastName</dd>
+                        <dt class="col-sm-2">Email</dt>
+                        <dd class="col-sm-10">@Model.Customer.Email</dd>
+                        <dt class="col-sm-2">Phone</dt>
+                        <dd class="col-sm-10">@Model.Customer.Phone</dd>
+                    </dl>
+                </div>
+            </div>
+        }
 
-<div class="text-danger" asp-validation-summary="All"></div>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-box" role="alert"></div>
 
-<form method="post">
-    <input type="hidden" asp-for="CustomerId" />
+        <form method="post">
+            <input type="hidden" asp-for="CustomerId" />
 
-    <h4>Select Existing Items</h4>
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">Select Existing Items</h2>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.InventoryItems.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Select</th>
+                                        <th>Item Type</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.InventoryItems)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" name="SelectedItemIds" value="@item.Id" />
+                                            </td>
+                                            <td>@item.ItemType</td>
+                                            <td>@item.Description</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="p-3">
+                            <p class="mb-0">This customer has no jewelry items saved yet.</p>
+                        </div>
+                    }
+                </div>
+            </div>
 
-    @if (Model.InventoryItems.Any())
-    {
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Select</th>
-                    <th>Item Type</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.InventoryItems)
-                {
-                    <tr>
-                        <td>
-                            <input type="checkbox" name="SelectedItemIds" value="@item.Id" />
-                        </td>
-                        <td>@item.ItemType</td>
-                        <td>@item.Description</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p>This customer has no jewelry items saved yet.</p>
-    }
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">Add New Item During Check-In</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-check mb-3">
+                        <input asp-for="Input.AddNewItemInline" class="form-check-input" />
+                        <label asp-for="Input.AddNewItemInline" class="form-check-label"></label>
+                    </div>
 
-    <hr />
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="Input.NewItemType" class="form-label"></label>
+                            <select asp-for="Input.NewItemType" class="form-select">
+                                <option value="">-- Select type --</option>
+                                <option>Ring</option>
+                                <option>Necklace</option>
+                                <option>Bracelet</option>
+                                <option>Earrings</option>
+                                <option>Charm</option>
+                                <option>Anklet</option>
+                                <option>Other</option>
+                            </select>
+                            <span asp-validation-for="Input.NewItemType" class="text-danger"></span>
+                        </div>
 
-    <h4>Add New Item During Check-In</h4>
+                        <div class="col-md-5">
+                            <label asp-for="Input.NewItemDescription" class="form-label"></label>
+                            <input asp-for="Input.NewItemDescription" class="form-control" />
+                            <span asp-validation-for="Input.NewItemDescription" class="text-danger"></span>
+                        </div>
 
-    <div class="form-check mb-3">
-        <input asp-for="Input.AddNewItemInline" class="form-check-input" />
-        <label asp-for="Input.AddNewItemInline" class="form-check-label"></label>
+                        <div class="col-md-3">
+                            <label asp-for="Input.NewItemParentItemId" class="form-label"></label>
+                            <select asp-for="Input.NewItemParentItemId" class="form-select">
+                                <option value="">(None)</option>
+                                @foreach (var bracelet in Model.BraceletOptions)
+                                {
+                                    <option value="@bracelet.Id">@bracelet.Description</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Input.NewItemParentItemId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-text mt-2">Choose a parent bracelet only when the new item is a charm.</div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Create Order</button>
+                <a asp-page="/Customers/Details" asp-route-id="@Model.CustomerId" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
     </div>
-
-    <div class="mb-3">
-        <label asp-for="Input.NewItemType" class="form-label"></label>
-        <select asp-for="Input.NewItemType" class="form-select">
-            <option value="">-- Select type --</option>
-            <option>Ring</option>
-            <option>Necklace</option>
-            <option>Bracelet</option>
-            <option>Earrings</option>
-            <option>Charm</option>
-            <option>Anklet</option>
-            <option>Other</option>
-        </select>
-        <span asp-validation-for="Input.NewItemType" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Input.NewItemDescription" class="form-label"></label>
-        <input asp-for="Input.NewItemDescription" class="form-control" />
-        <span asp-validation-for="Input.NewItemDescription" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Input.NewItemParentItemId" class="form-label"></label>
-        <select asp-for="Input.NewItemParentItemId" class="form-select">
-            <option value="">(None)</option>
-            @foreach (var bracelet in Model.BraceletOptions)
-            {
-                <option value="@bracelet.Id">@bracelet.Description</option>
-            }
-        </select>
-        <span asp-validation-for="Input.NewItemParentItemId" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Create Order</button>
-    <a asp-page="/Customers/Details" asp-route-id="@Model.CustomerId" class="btn btn-secondary">Cancel</a>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

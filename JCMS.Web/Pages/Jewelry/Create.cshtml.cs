@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using JCMS.Application.Services;
-using JCMS.Infrastructure.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -27,18 +26,22 @@ namespace JCMS.Web.Pages.Jewelry
         public int CustomerId { get; set; }
 
         [BindProperty]
-        public InputModel Input { get; set; } = new InputModel();
+        public InputModel Input { get; set; } = new();
 
-        public List<BraceletOption> BraceletOptions { get; set; } = new List<BraceletOption>();
+        public string CustomerName { get; set; } = string.Empty;
+
+        public List<BraceletOption> BraceletOptions { get; set; } = new();
 
         public class InputModel
         {
-            [Required]
-            public string ItemType { get; set; } = null!;
+            [Required(ErrorMessage = "Select a jewelry item type.")]
+            [Display(Name = "Item Type")]
+            public string ItemType { get; set; } = string.Empty;
 
-            [Required]
-            [MaxLength(500)]
-            public string Description { get; set; } = null!;
+            [Required(ErrorMessage = "Enter a description for the jewelry item.")]
+            [MaxLength(500, ErrorMessage = "The description cannot be longer than 500 characters.")]
+            [Display(Name = "Description")]
+            public string Description { get; set; } = string.Empty;
 
             [Display(Name = "Parent Bracelet (for charms)")]
             public int? ParentItemId { get; set; }
@@ -47,7 +50,7 @@ namespace JCMS.Web.Pages.Jewelry
         public class BraceletOption
         {
             public int Id { get; set; }
-            public string Label { get; set; } = null!;
+            public string Label { get; set; } = string.Empty;
         }
 
         public IActionResult OnGet()
@@ -58,6 +61,7 @@ namespace JCMS.Web.Pages.Jewelry
                 return NotFound();
             }
 
+            CustomerName = $"{customer.FirstName} {customer.LastName}";
             LoadBracelets();
             return Page();
         }
@@ -70,13 +74,14 @@ namespace JCMS.Web.Pages.Jewelry
                 return NotFound();
             }
 
+            CustomerName = $"{customer.FirstName} {customer.LastName}";
+
             if (!ModelState.IsValid)
             {
                 LoadBracelets();
                 return Page();
             }
 
-            // Only charms should have a parent bracelet
             if (!string.Equals(Input.ItemType, "Charm", System.StringComparison.OrdinalIgnoreCase))
             {
                 Input.ParentItemId = null;
@@ -98,7 +103,6 @@ namespace JCMS.Web.Pages.Jewelry
             TempData["SuccessMessage"] = "Jewelry item added successfully.";
             return RedirectToPage("/Customers/Details", new { id = CustomerId });
         }
-
 
         private void LoadBracelets()
         {

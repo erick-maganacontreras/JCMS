@@ -17,30 +17,33 @@ namespace JCMS.Web.Pages.Customers
         }
 
         [BindProperty]
-        public InputModel Input { get; set; } = new InputModel();
+        public InputModel Input { get; set; } = new();
 
-        public class InputModel 
+        public class InputModel
         {
-            [Required]
-            public string FirstName { get; set; } = null!;
+            [Required(ErrorMessage = "Enter the customer's first name.")]
+            [Display(Name = "First Name")]
+            public string FirstName { get; set; } = string.Empty;
 
-            [Required]
-            public string LastName { get; set; } = null!;
+            [Required(ErrorMessage = "Enter the customer's last name.")]
+            [Display(Name = "Last Name")]
+            public string LastName { get; set; } = string.Empty;
 
-            [Required]
-            [EmailAddress]
-            public string Email { get; set; } = null!;
+            [Required(ErrorMessage = "Enter the customer's email address.")]
+            [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+            [Display(Name = "Email")]
+            public string Email { get; set; } = string.Empty;
 
-            [Required]
-            [Display(Name = "Phone (XXX) XXX-XXXX")]
-            public string Phone { get; set; } = null!;
+            [Required(ErrorMessage = "Enter the customer's phone number.")]
+            [Display(Name = "Phone")]
+            public string Phone { get; set; } = string.Empty;
         }
 
         public void OnGet()
         {
         }
 
-        public IActionResult OnPost() 
+        public IActionResult OnPost()
         {
             if (!ModelState.IsValid)
             {
