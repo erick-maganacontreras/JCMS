@@ -37,6 +37,10 @@
                                 <li class="nav-item">
                                     <a class="nav-link" asp-page="/Admin/Reports">Reports</a>
                                 </li>
+                                <a class="nav-link @(Context.Request.Path.StartsWithSegments("/Admin/Staff") ? "active" : "")"
+                                   asp-page="/Admin/Staff/Index">
+                                    Users
+                                </a>
                             }
                         </ul>
 
