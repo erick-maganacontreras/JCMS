@@ -58,7 +58,15 @@ namespace JCMS.Web.Pages.Customers
 
             if (!result.Success)
             {
-                ModelState.AddModelError(string.Empty, result.ErrorMessage ?? "Unable to create customer.");
+                if (result.ErrorMessage == "Anotehr customer already uses this email")
+                {
+                    ModelState.AddModelError("Input.Email", result.ErrorMessage);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, result.ErrorMessage ?? "Unable to create customer.");
+                }
+
                 return Page();
             }
 

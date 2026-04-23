@@ -129,14 +129,51 @@ namespace JCMS.Application.Services
                     return (false, "New item type and description are required when adding an item during check-in.", 0, null);
                 }
 
+                newItemType = newItemType.Trim();
+                newItemDescription = newItemDescription.Trim();
+
+                if (newItemDescription.Length > 500)
+                {
+                    return (false, "Description cannot exceed 500 characters.", 0, null);
+                }
+
+                var allowedItemTypes = new[]
+                {
+        "Ring", "Necklace", "Bracelet", "Earrings", "Charm", "Anklet", "Other"
+    };
+
+                if (!allowedItemTypes.Any(t => string.Equals(t, newItemType, StringComparison.OrdinalIgnoreCase)))
+                {
+                    return (false, "Invalid item type.", 0, null);
+                }
+
+                if (string.Equals(newItemType, "Charm", StringComparison.OrdinalIgnoreCase) && !newItemParentItemId.HasValue)
+                {
+                    return (false, "A charm must be linked to a parent bracelet.", 0, null);
+                }
+
+                if (!string.Equals(newItemType, "Charm", StringComparison.OrdinalIgnoreCase))
+                {
+                    newItemParentItemId = null;
+                }
+
+                if (newItemParentItemId.HasValue)
+                {
+                    var parentItem = _jewelryItemRepository.GetById(newItemParentItemId.Value);
+                    if (parentItem == null ||
+                        parentItem.CustomerId != customerId ||
+                        !string.Equals(parentItem.ItemType, "bracelet", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return (false, "Selected parent item is not a bracelet for this customer.", 0, null);
+                    }
+                }
+
                 var newItem = new JewelryItem
                 {
                     CustomerId = customerId,
-                    ItemType = newItemType.Trim(),
-                    Description = newItemDescription.Trim(),
-                    ParentItemId = string.Equals(newItemType.Trim(), "Charm", StringComparison.OrdinalIgnoreCase)
-                        ? newItemParentItemId
-                        : null
+                    ItemType = newItemType.ToLower(),
+                    Description = newItemDescription,
+                    ParentItemId = newItemParentItemId
                 };
 
                 _jewelryItemRepository.Add(newItem);

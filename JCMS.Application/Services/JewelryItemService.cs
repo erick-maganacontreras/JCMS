@@ -56,22 +56,37 @@ namespace JCMS.Application.Services
                 return (false, "Description is required.");
             }
 
+            description = description.Trim();
+            itemType = itemType.Trim();
+
             if (description.Length > 500)
             {
                 return (false, "Description cannot exceed 500 characters.");
             }
-
-            itemType = itemType.ToLower();
 
             if (!IsValidItemType(itemType))
             {
                 return (false, "Invalid item type.");
             }
 
+            var normalizedItemType = itemType.ToLower();
+
+            if (string.Equals(normalizedItemType, "charm", StringComparison.OrdinalIgnoreCase) && !parentItemId.HasValue)
+            {
+                return (false, "A charm must be linked to a parent bracelet.");
+            }
+
+            if (!string.Equals(normalizedItemType, "charm", StringComparison.OrdinalIgnoreCase))
+            {
+                parentItemId = null;
+            }
+
             if (parentItemId.HasValue)
             {
                 var parent = _jewelryItemRepository.GetById(parentItemId.Value);
-                if (parent == null || parent.CustomerId !=  customerId || parent.ItemType != "bracelet")
+                if (parent == null ||
+                    parent.CustomerId != customerId ||
+                    !string.Equals(parent.ItemType, "bracelet", StringComparison.OrdinalIgnoreCase))
                 {
                     return (false, "Selected parent item is not a bracelet for this customer.");
                 }
@@ -80,8 +95,8 @@ namespace JCMS.Application.Services
             var item = new JewelryItem
             {
                 CustomerId = customerId,
-                ItemType = itemType,
-                Description = description.Trim(),
+                ItemType = normalizedItemType,
+                Description = description,
                 ParentItemId = parentItemId,
             };
 
@@ -98,9 +113,11 @@ namespace JCMS.Application.Services
                 return (false, "Description is required.");
             }
 
+            newDescription = newDescription.Trim();
+
             if (newDescription.Length > 500)
             {
-                return (false, "Jewelry item not found.");
+                return (false, "Description cannot exceed 500 characters.");
             }
 
             var item = _jewelryItemRepository.GetById(itemId);
@@ -109,7 +126,7 @@ namespace JCMS.Application.Services
                 return (false, "Jewelry item not found.");
             }
 
-            item.Description = newDescription.Trim();
+            item.Description = newDescription;
             _jewelryItemRepository.Update(item);
             _jewelryItemRepository.SaveChanges();
 
@@ -134,4 +151,6 @@ namespace JCMS.Application.Services
             return false;
         }
     }
+
+
 }

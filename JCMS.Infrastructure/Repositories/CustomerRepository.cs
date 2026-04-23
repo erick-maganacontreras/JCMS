@@ -29,7 +29,7 @@ namespace JCMS.Infrastructure.Repositories
         public Customer? GetByEmail(string email)
         {
             return _context.Customers
-                .FirstOrDefault(c => c.Email == email);
+                .FirstOrDefault(c => c.Email.ToLower() == email.ToLower());
         }
 
         public IEnumerable<Customer> Search(string? term)

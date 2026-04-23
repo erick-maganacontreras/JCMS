@@ -95,7 +95,15 @@ namespace JCMS.Web.Pages.Jewelry
 
             if (!result.Success)
             {
-                ModelState.AddModelError(string.Empty, result.ErrorMessage ?? "Unable to add jewelry item.");
+                if (result.ErrorMessage == "A charm must be linked to a parent bracelet." || result.ErrorMessage == "Selected parent item is not a bracelet for this customer.")
+                {
+                    ModelState.AddModelError("Input.ParentItemId", result.ErrorMessage);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, result.ErrorMessage ?? "Unable to add jewelry item.");
+                }
+
                 LoadBracelets();
                 return Page();
             }
