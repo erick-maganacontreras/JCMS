@@ -24,12 +24,14 @@ namespace JCMS.Infrastructure.Repositories
                 .Include(j => j.Customer)
                 .Include(j => j.ParentItem)
                 .Include(j => j.ChildItems)
+                .Include(j => j.CleaningHistoryEntries)
                 .FirstOrDefault(j => j.Id == id);
         }
 
         public IEnumerable<JewelryItem> GetByCustomerId(int customerId)
         {
             return _context.JewelryItems
+                .Include(j => j.CleaningHistoryEntries)
                 .Where(j => j.CustomerId == customerId)
                 .OrderBy(j => j.ItemType)
                 .ThenBy(j => j.Description)
@@ -39,7 +41,7 @@ namespace JCMS.Infrastructure.Repositories
         public IEnumerable<JewelryItem> GetBraceletsByCustomerId(int customerId)
         {
             return _context.JewelryItems
-                .Where(j => j.CustomerId == customerId && j.ItemType == "Bracelet")
+                .Where(j => j.CustomerId == customerId && j.ItemType == "bracelet")
                 .OrderBy(j => j.Description)
                 .ToList();
         }

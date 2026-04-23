@@ -271,14 +271,15 @@ namespace JCMS.Application.Services
 
             if (newStatus == OrderStatuses.Completed && order.CompletedAt == null)
             {
-                order.CompletedAt = DateTime.UtcNow;
+                var completedAt = DateTime.UtcNow;
+                order.CompletedAt = completedAt;
 
                 foreach (var item in order.OrderItems)
                 {
                     var history = new CleaningHistory
                     {
                         JewelryItemId = item.JewelryItemId,
-                        CleaningDate = DateTime.UtcNow,
+                        CleaningDate = completedAt,
                         ConfirmationNumber = order.ConfirmationNumber,
                         StaffId = order.StaffId
                     };
