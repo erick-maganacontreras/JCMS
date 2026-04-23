@@ -249,12 +249,21 @@ namespace JCMS.Application.Services
         {
             var validStatuses = new[]
             {
-                OrderStatuses.CheckedIn,
-                OrderStatuses.InProgress,
-                OrderStatuses.Completed,
-                OrderStatuses.PickedUp,
-                OrderStatuses.Cancelled
-            };
+        OrderStatuses.CheckedIn,
+        OrderStatuses.InProgress,
+        OrderStatuses.Completed,
+        OrderStatuses.PickedUp,
+        OrderStatuses.Cancelled
+    };
+
+            var allowedTransitions = new Dictionary<string, string[]>
+    {
+        { OrderStatuses.CheckedIn, new[] { OrderStatuses.InProgress, OrderStatuses.Cancelled } },
+        { OrderStatuses.InProgress, new[] { OrderStatuses.Completed, OrderStatuses.Cancelled } },
+        { OrderStatuses.Completed, new[] { OrderStatuses.PickedUp } },
+        { OrderStatuses.PickedUp, Array.Empty<string>() },
+        { OrderStatuses.Cancelled, Array.Empty<string>() }
+    };
 
             var order = _cleaningOrderRepository.GetById(orderId);
             if (order == null)
@@ -262,12 +271,30 @@ namespace JCMS.Application.Services
                 return (false, "Order not found.");
             }
 
-            if (string.IsNullOrWhiteSpace(newStatus) || !validStatuses.Contains(newStatus))
+            if (string.IsNullOrWhiteSpace(newStatus))
             {
                 return (false, "A valid status is required.");
             }
 
-            order.Status = newStatus.Trim();
+            newStatus = newStatus.Trim();
+
+            if (!validStatuses.Contains(newStatus))
+            {
+                return (false, "A valid status is required.");
+            }
+
+            if (order.Status == newStatus)
+            {
+                return (true, null);
+            }
+
+            if (!allowedTransitions.ContainsKey(order.Status) ||
+                !allowedTransitions[order.Status].Contains(newStatus))
+            {
+                return (false, $"Cannot change status from '{order.Status}' to '{newStatus}'.");
+            }
+
+            order.Status = newStatus;
 
             if (newStatus == OrderStatuses.Completed && order.CompletedAt == null)
             {
